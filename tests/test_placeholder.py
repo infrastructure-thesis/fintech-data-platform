@@ -1,5 +1,6 @@
 import pytest
 
+
 def test_sample_transaction(sample_transaction):
     """Test sample transaction fixture"""
     assert sample_transaction["id"] == "tx_001"
