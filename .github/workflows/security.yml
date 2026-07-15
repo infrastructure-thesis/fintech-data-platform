@@ -1,0 +1,17 @@
+name: Security Scan
+on: [push, pull_request]
+
+jobs:
+  security:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - run: pip install -r requirements.txt
+
+      - run: pip install pip-audit bandit
+
+      - run: pip-audit --strict
+
+      - run: bandit -r src/
