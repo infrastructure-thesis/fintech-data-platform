@@ -1,0 +1,14 @@
+[project]
+name = "fintech-data-platform"
+version = "0.1.0"
+description = "Production settlement data pipeline"
+requires-python = ">=3.11"
+
+[tool.pytest.ini_options]
+testpaths = ["tests]
+addopts = "--cov=src --cov-report=term-missing --cov-fail-under=85"
+
+[tool.mypy]
+python_version = "3.11"
+strict = true
+
