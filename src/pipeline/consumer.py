@@ -22,7 +22,7 @@ class SettlementConsumer:
 
     def _parse_transaction(self, data: Dict[str, Any]) -> Transaction:
         """Convert dict to Transaction object."""
-        from datetime import datetime, timezone
+        from datetime import datetime
         from decimal import Decimal
 
         return Transaction(
