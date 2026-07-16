@@ -36,9 +36,7 @@ class AuditLogEntry:
     audit_timestamp: datetime
 
     @classmethod
-    def from_transaction(
-        cls, tx: Transaction, compliance_hash: str
-    ) -> "AuditLogEntry":
+    def from_transaction(cls, tx: Transaction, compliance_hash: str) -> "AuditLogEntry":
         """Create audit entry from transaction."""
         return cls(
             timestamp=tx.timestamp,
