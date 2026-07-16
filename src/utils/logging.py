@@ -2,6 +2,7 @@ from typing import cast
 import structlog
 import sys
 
+
 def configure_logging() -> None:
     """Configure structured logging for production."""
     structlog.configure(
@@ -20,6 +21,7 @@ def configure_logging() -> None:
         logger_factory=structlog.stdlib.LoggerFactory(),
         cache_logger_on_first_use=True,
     )
+
 
 def get_logger(name: str) -> structlog.stdlib.BoundLogger:
     """Get structured logger."""
