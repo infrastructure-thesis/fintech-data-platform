@@ -41,5 +41,7 @@ def test_verify_hash_invalid():
         "timestamp": "2026-01-01T00:00:00",
     }
 
-    wrong_hash = "0000000000000000000000000000000000000000000000000000000000000000"
+    wrong_hash = (
+        "0000000000000000000000000000000000000000000000000000000000000000"
+        )
     assert ComplianceHasher.verify_hash(data, wrong_hash) is False

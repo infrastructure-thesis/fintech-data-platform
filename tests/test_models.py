@@ -1,6 +1,7 @@
 import pytest
 from datetime import datetime, timezone
 from decimal import Decimal
+
 from src.pipeline.models import Transaction, AuditLogEntry
 
 
@@ -73,13 +74,12 @@ def test_transaction_validation_invalid_region():
 
 def test_audit_log_entry_from_transaction():
     """Test creating audit entry from transaction"""
-    now = datetime.now(timezone.utc)
     tx = Transaction(
         id="tx_001",
         tenant_id="tenant_abc",
         amount=Decimal("100.50"),
         region="EU",
-        timestamp=datetime.now(),
+        timestamp=datetime.now(timezone.utc),
     )
     audit_entry = AuditLogEntry.from_transaction(tx, "abc123def456")
 

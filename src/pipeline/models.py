@@ -36,7 +36,9 @@ class AuditLogEntry:
     audit_timestamp: datetime
 
     @classmethod
-    def from_transaction(cls, tx: Transaction, compliance_hash: str) -> "AuditLogEntry":
+    def from_transaction(
+        cls, tx: Transaction, compliance_hash: str
+    ) -> "AuditLogEntry":
         """Create audit entry from transaction."""
         return cls(
             timestamp=tx.timestamp,
@@ -45,7 +47,5 @@ class AuditLogEntry:
             amount=tx.amount,
             region=tx.region,
             compliance_hash=compliance_hash,
-            audit_timestamp=datetime.now(
-                timezone.utc
-            ),  # ✅ FIXED: Use timezone-aware datetime
+            audit_timestamp=datetime.now(timezone.utc),
         )

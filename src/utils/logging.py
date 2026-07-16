@@ -1,6 +1,6 @@
 from typing import cast
+
 import structlog
-import sys
 
 
 def configure_logging() -> None:
