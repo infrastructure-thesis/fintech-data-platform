@@ -1,3 +1,4 @@
+from typing import cast
 import structlog
 import sys
 
@@ -22,4 +23,4 @@ def configure_logging() -> None:
 
 def get_logger(name: str) -> structlog.stdlib.BoundLogger:
     """Get structured logger."""
-    return structlog.get_logger(name)
+    return cast(structlog.stdlib.BoundLogger, structlog.get_logger(name))
