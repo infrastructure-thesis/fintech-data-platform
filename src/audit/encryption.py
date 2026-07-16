@@ -18,7 +18,9 @@ class ComplianceHasher:
         return hashlib.sha256(content.encode()).hexdigest()
 
     @staticmethod
-    def verify_hash(transaction_data: Dict[str, str], provided_hash: str) -> bool:
+    def verify_hash(
+        transaction_data: Dict[str, str], provided_hash: str
+    ) -> bool:
         """Verify that hash matches transaction data."""
         computed_hash = ComplianceHasher.compute_hash(transaction_data)
         return computed_hash == provided_hash
