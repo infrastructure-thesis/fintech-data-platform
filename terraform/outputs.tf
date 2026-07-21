@@ -13,12 +13,12 @@ output "kafka_security_group_id" {
   value       = module.kafka_cluster.security_group_id
 }
 
-output "clickhouse_endpoint" {
-  description = "Clickhouse cluster endpoint"
-  value       = "To be added in Week 3"
+output "clickhouse_security_group_id" {
+  description = "Clickhouse security group ID"
+  value       = module.clickhouse_cluster.security_group_id
 }
 
-output "prometheus_url" {
-  description = "Prometheus monitoring endpoint"
-  value       = "To be added in Week 7"
+output "clickhouse_log_group" {
+  description = "Clickhouse CloudWatch log group"
+  value       = module.clickhouse_cluster.log_group_name
 }

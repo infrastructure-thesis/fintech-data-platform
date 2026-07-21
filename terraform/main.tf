@@ -29,5 +29,15 @@ module "kafka_cluster" {
   subnet_ids          = var.subnet_ids
   allowed_cidr_blocks = var.kafka_allowed_cidr_blocks
 }
-# Placeholder for Clickhouse (Week 2 Day 7)
-# module "Clickhouse_cluster" { ... }
+
+module "clickhouse_cluster" {
+  source = "./modules/clickhouse"
+
+  cluster_name        = "${var.environment}-settlement-clickhouse"
+  environment         = var.environment
+  cluster_size        = var.clickhouse_nodes
+  instance_type       = var.clickhouse_instance_type
+  vpc_id              = var.vpc_id
+  subnet_ids          = var.subnet_ids
+  allowed_cidr_blocks = var.clickhouse_allowed_cidr_blocks
+}

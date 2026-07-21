@@ -38,3 +38,21 @@ variable "kafka_allowed_cidr_blocks" {
   default     = ["10.0.0.0/8"]
   description = "CIDR blocks allowed to access Kafka"
 }
+
+variable "clickhouse_nodes" {
+  type        = number
+  description = "Number of Clickhouse nodes"
+  default     = 2
+}
+
+variable "clickhouse_instance_type" {
+  type        = string
+  description = "Clickhouse instance type"
+  default     = "r5.2xlarge"
+}
+
+variable "clickhouse_allowed_cidr_blocks" {
+  type        = list(string)
+  description = "CIDR blocks allowed to access Clickhouse"
+  default     = ["10.0.0.0/8"]
+}
