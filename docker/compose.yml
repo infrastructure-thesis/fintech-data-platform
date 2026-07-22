@@ -3,11 +3,13 @@ version: '3.8'
 services:
   kafka:
     image: confluentinc/cp-kafka:7.5.0
+    container_name: settlement-kafka
     environment:
       KAFKA_BROKER_ID: 1
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
       KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
     depends_on:
       - zookeeper
     ports:
@@ -15,6 +17,7 @@ services:
 
   zookeeper:
     image: confluentinc/cp-zookeeper:7.5.0
+    container_name: settlement-zookeeper
     environment:
       ZOOKEEPER_CLIENT_PORT: 2181
     ports:
@@ -22,11 +25,28 @@ services:
 
   clickhouse:
     image: clickhouse/clickhouse-server:latest
+    container_name: settlement-clickhouse
+    environment:
+      CLICKHOUSE_DB: settlement
+    volumes:
+      - ./clickhouse_init.sql:/docker-entrypoint-initdb.d/init.sql
     ports:
       - "9000:9000"
       - "8123:8123"
+    
+  python:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    container_name: settlement-pipeline
+    environment:
+      KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+      CLICKHOUSE_HOST: clickhouse
+      CLICKHOUSE_PORT: 9000
+    depends_on:
+      - kafka
+      - clickhouse
     volumes:
-      - clickhouse_data:/var/lib/clickhouse
-
-volumes:
-  clickhouse_data:
+      - ../src:/app/src
+      - ../tests:/app/tests
+    command: python -m pytest tests/ --cov=src -v
