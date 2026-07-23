@@ -11,3 +11,6 @@ addopts = "--cov=src --cov-report=term-missing --cov-fail-under=85"
 [tool.mypy]
 python_version = "3.14"
 strict = true
+
+[project.scripts]
+settlement-pipeline = "src.cli:main"
