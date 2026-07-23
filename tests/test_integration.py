@@ -1,9 +1,6 @@
 import json
-import time
 from datetime import datetime, timezone
-from decimal import Decimal
 
-import pytest
 
 from src.pipeline.consumer import SettlementConsumer
 from src.pipeline.models import Transaction
