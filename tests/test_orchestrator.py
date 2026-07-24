@@ -48,8 +48,8 @@ def test_process_batch_success(orchestrator, sample_messages):
     assert failed == 0
 
 
-def test_pipeline_stats(orchestrator, sample_messages):
-    """Test pipeline statistics."""
+def test_pipeline_stats_success(orchestrator, sample_messages):
+    """Test pipeline statistics on success."""
     orchestrator.process_batch(sample_messages)
     stats = orchestrator.get_stats()
 
@@ -57,6 +57,18 @@ def test_pipeline_stats(orchestrator, sample_messages):
     assert stats["failed"] == 0
     assert stats["total"] == 3
     assert stats["success_rate"] == 100.0
+
+
+def test_pipeline_stats_with_failures(orchestrator):
+    """Test pipeline statistics with failures."""
+    invalid_messages = [b"invalid json"]
+    orchestrator.process_batch(invalid_messages)
+    stats = orchestrator.get_stats()
+
+    assert stats["processed"] == 0
+    assert stats["failed"] == 1
+    assert stats["total"] == 1
+    assert stats["success_rate"] == 0.0
 
 
 def test_pipeline_error_handling(orchestrator):
