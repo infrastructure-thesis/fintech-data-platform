@@ -1,8 +1,6 @@
-import logging
 from typing import Any, List
 
 from src.pipeline.consumer import SettlementConsumer
-from src.pipeline.models import AuditLogEntry
 from src.pipeline.transformer import SettlementTransformer
 from src.pipeline.writer import ClickhouseWriter
 from src.utils.logging import get_logger
