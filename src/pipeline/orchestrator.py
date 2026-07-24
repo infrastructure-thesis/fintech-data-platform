@@ -1,5 +1,5 @@
 import logging
-from typing import List
+from typing import Any, List
 
 from src.pipeline.consumer import SettlementConsumer
 from src.pipeline.models import AuditLogEntry
@@ -65,10 +65,12 @@ class PipelineOrchestrator:
 
         return processed, failed
 
-    def get_stats(self) -> dict:
+    def get_stats(self) -> dict[str, Any]:
         """Return pipeline statistics."""
         total = self.processed_count + self.failed_count
-        success_rate = (self.processed_count / total * 100) if total > 0 else 0
+        success_rate = (
+            (self.processed_count / total * 100) if total > 0 else 0
+        )
 
         return {
             "processed": self.processed_count,
