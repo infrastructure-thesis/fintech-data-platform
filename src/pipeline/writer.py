@@ -21,19 +21,17 @@ class ClickhouseWriter:
         self.port = port
         self.max_retries = max_retries
         self.table = "audit_log"
-        # Lazy import to avoid hard dependency at init time
-        self.client = None
-        
-    def _get_client(self):
+        self.client: Optional[object] = None
+
+    def _get_client(self) -> object:
         """Get or create Clickhouse client."""
         if self.client is None:
             from src.clickhouse_client import ClickhouseClient
-            
-            self.client = ClickhouseClient(
-                host=self.host, port=self.port
-            )
-            self.client.connect()
-            self.client.create_table_if_not_exists()
+
+            new_client = ClickhouseClient(host=self.host, port=self.port)
+            new_client.connect()
+            new_client.create_table_if_not_exists()
+            self.client = new_client
         return self.client
 
     def write(self, entry: AuditLogEntry) -> bool:
@@ -41,7 +39,7 @@ class ClickhouseWriter:
         for attempt in range(self.max_retries):
             try:
                 client = self._get_client()
-                if client.insert_audit_entry(entry):
+                if client.insert_audit_entry(entry):  # type: ignore[attr-defined]
                     return True
             except Exception as e:
                 if attempt == self.max_retries - 1:
@@ -52,7 +50,7 @@ class ClickhouseWriter:
                         attempts=self.max_retries,
                     )
                     return False
-                wait_time = 2**attempt
+                wait_time = 2 ** attempt
                 logger.warning(
                     "audit_write_retry",
                     transaction_id=entry.transaction_id,

@@ -19,3 +19,11 @@ settlement-pipeline = "src.cli:main"
 omit = [
     "src/kafka_consumer_loop.py"
 ]
+
+[[tool.mypy.overrides]]
+module = "clickhouse_driver.*"
+ignore_missing_imports = true
+
+[[tool.mypy.overrides]]
+module = "kafka.*"
+ignore_missing_imports = true
