@@ -1,4 +1,5 @@
 import time
+from typing import Optional
 
 from src.pipeline.models import AuditLogEntry
 from src.utils.logging import get_logger
@@ -7,7 +8,7 @@ logger = get_logger(__name__)
 
 
 class ClickhouseWriter:
-    """Write audit log entries to Clickhouse."""
+    """Write audit log entries to Clickhouse with retry logic."""
 
     def __init__(
         self,
@@ -20,18 +21,28 @@ class ClickhouseWriter:
         self.port = port
         self.max_retries = max_retries
         self.table = "audit_log"
+        # Lazy import to avoid hard dependency at init time
+        self.client = None
+        
+    def _get_client(self):
+        """Get or create Clickhouse client."""
+        if self.client is None:
+            from src.clickhouse_client import ClickhouseClient
+            
+            self.client = ClickhouseClient(
+                host=self.host, port=self.port
+            )
+            self.client.connect()
+            self.client.create_table_if_not_exists()
+        return self.client
 
     def write(self, entry: AuditLogEntry) -> bool:
         """Write audit entry with retry logic."""
         for attempt in range(self.max_retries):
             try:
-                self._insert(entry)
-                logger.info(
-                    "audit_write_success",
-                    transaction_id=entry.transaction_id,
-                    attempt=attempt + 1,
-                )
-                return True
+                client = self._get_client()
+                if client.insert_audit_entry(entry):
+                    return True
             except Exception as e:
                 if attempt == self.max_retries - 1:
                     logger.error(
@@ -50,8 +61,3 @@ class ClickhouseWriter:
                 )
                 time.sleep(wait_time)
         return False
-
-    def _insert(self, entry: AuditLogEntry) -> None:
-        """Insert entry into Clickhouse (stub for now)."""
-        if not entry.transaction_id or not entry.compliance_hash:
-            raise ValueError("Missing required fields for audit entry")

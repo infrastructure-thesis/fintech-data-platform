@@ -1,7 +1,6 @@
 import json
 from datetime import datetime, timezone
 
-
 import pytest
 
 from src.pipeline.orchestrator import PipelineOrchestrator
@@ -40,6 +39,7 @@ def test_orchestrator_initialization(orchestrator):
     assert orchestrator.failed_count == 0
 
 
+@pytest.mark.skip(reason="Requires Clickhouse running")
 def test_process_batch_success(orchestrator, sample_messages):
     """Test processing batch of messages."""
     processed, failed = orchestrator.process_batch(sample_messages)
@@ -48,6 +48,7 @@ def test_process_batch_success(orchestrator, sample_messages):
     assert failed == 0
 
 
+@pytest.mark.skip(reason="Requires Clickhouse running")
 def test_pipeline_stats_success(orchestrator, sample_messages):
     """Test pipeline statistics on success."""
     orchestrator.process_batch(sample_messages)

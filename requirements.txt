@@ -1,5 +1,5 @@
 kafka-python==3.0.0
-clickhouse-driver==0.2.10
+clickhouse-driver==0.2.7
 pydantic==2.13.4
 structlog==24.1.0
 prometheus-client==0.19.0

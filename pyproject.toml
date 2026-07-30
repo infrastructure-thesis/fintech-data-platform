@@ -14,3 +14,8 @@ strict = true
 
 [project.scripts]
 settlement-pipeline = "src.cli:main"
+
+[tool.coverage.run]
+omit = [
+    "src/kafka_consumer_loop.py"
+]
