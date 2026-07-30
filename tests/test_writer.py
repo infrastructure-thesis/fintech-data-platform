@@ -24,7 +24,7 @@ def audit_entry():
         region="EU",
         compliance_hash="abc123def456",
         audit_timestamp=datetime.now(timezone.utc),
-        )
+    )
 
 
 def test_writer_initialization(writer):

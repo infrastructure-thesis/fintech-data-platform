@@ -39,7 +39,8 @@ class ClickhouseWriter:
         for attempt in range(self.max_retries):
             try:
                 client = self._get_client()
-                if client.insert_audit_entry(entry):  # type: ignore[attr-defined]
+                success = client.insert_audit_entry(entry)  # type: ignore
+                if success:
                     return True
             except Exception as e:
                 if attempt == self.max_retries - 1:
@@ -50,7 +51,7 @@ class ClickhouseWriter:
                         attempts=self.max_retries,
                     )
                     return False
-                wait_time = 2 ** attempt
+                wait_time = 2**attempt
                 logger.warning(
                     "audit_write_retry",
                     transaction_id=entry.transaction_id,

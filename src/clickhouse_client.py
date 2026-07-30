@@ -10,7 +10,7 @@ logger = get_logger(__name__)
 
 class ClickhouseClient:
     """Real Clickhouse client with connection pooling and retry logic."""
-    
+
     def __init__(
         self,
         host: str,
@@ -24,7 +24,7 @@ class ClickhouseClient:
         self.database = database
         self.max_retries = max_retries
         self.client: Optional[Client] = None
-        
+
     def connect(self) -> bool:
         """Connect to Clickhouse server."""
         try:
@@ -44,13 +44,13 @@ class ClickhouseClient:
         except Exception as e:
             logger.error("Clickhouse_connection_failed", error=str(e))
             return False
-        
+
     def create_table_if_not_exists(self) -> bool:
         """Create audit_log table if it doesn't exist."""
         if not self.client:
             logger.error("clickhouse_not_connected")
             return False
-        
+
         try:
             self.client.execute(
                 """
@@ -72,13 +72,13 @@ class ClickhouseClient:
         except Exception as e:
             logger.error("clickhouse_table_creation_failed", error=str(e))
             return False
-        
+
     def insert_audit_entry(self, entry: AuditLogEntry) -> bool:
         """Insert audit log entry into Clickhouse."""
         if not self.client:
             logger.error("clickhouse_not_connected")
             return False
-        
+
         try:
             self.client.execute(
                 """
@@ -111,7 +111,7 @@ class ClickhouseClient:
                 error=str(e),
             )
             return False
-        
+
     def close(self) -> None:
         """Close Clickhouse connection."""
         if self.client:

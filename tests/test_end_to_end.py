@@ -12,6 +12,7 @@ pytestmark = pytest.mark.skip(
     reason="Requires Clickhouse server running on localhost:9000"
 )
 
+
 def test_full_pipeline_e2e():
     """Test complete pipeline: message → consumer → transformer →
     orchestrator"""
