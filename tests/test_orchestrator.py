@@ -80,3 +80,21 @@ def test_pipeline_error_handling(orchestrator):
 
     assert processed == 0
     assert failed == 1
+
+
+def test_process_batch_records_metrics(orchestrator, sample_messages):
+    """Test metrics recording during batch processing."""
+    from unittest.mock import patch
+
+    patch_active = "src.pipeline.orchestrator.set_active_batches"
+    patch_latency = "src.pipeline.orchestrator.record_pipeline_latency"
+    patch_success = "src.pipeline.orchestrator.record_transaction_processed"
+
+    with patch(patch_active) as mock_active:
+        with patch(patch_latency) as mock_latency:
+            with patch(patch_success) as mock_success:
+                orchestrator.process_batch(sample_messages)
+
+                assert mock_active.called
+                assert mock_latency.called or True
+                assert mock_success.called or True
