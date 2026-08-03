@@ -13,7 +13,7 @@
 - Compliance hash tracking by region
 - Kafka consumer lag monitoring
 - Metrics HTTP endpoint (FastAPI-based)
-- 39 tests passing, 88%+ coverage
+- 40 tests passing, 86%+ coverage
 
 ## Infrastructure Complete
 - Kafka: MSK cluster (Terraform)
@@ -25,7 +25,7 @@
 ## Ready for Production
 ✅ Infrastructure as Code
 ✅ CI/CD Pipeline (Github Actions)
-✅ Comprehensive Tests (88% coverage)
+✅ Comprehensive Tests (86% coverage)
 ✅ Monitoring & Observability
 ✅ Error Handling & Retry Logic
 ✅ Compliance Hashing (FSA/SOX ready)
