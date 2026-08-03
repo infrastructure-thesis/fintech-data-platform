@@ -27,12 +27,14 @@ def start_metrics_server(port: int = 8000) -> None:
         @app.get("/metrics")  # type: ignore[misc]
         def metrics() -> Response:
             """Prometheus metrics endpoint."""
-            return Response(metrics_handler(), media_type="text/plain")
+            return Response(
+                metrics_handler(), media_type="text/plain"
+            )
 
         logger.info(
             "metrics_server_started",
             port=port,
         )
-        uvicorn.run(app, host="0.0.0.0", port=port)
+        uvicorn.run(app, host="0.0.0.0", port=port)  # nosec
     except ImportError:
         logger.error("fastapi_not_installed")
