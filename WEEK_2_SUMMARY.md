@@ -74,7 +74,6 @@ tests/
 
 
 ## What's Ready for Week 3
-
 ✅ Kafka + Clickhouse infrastructure as code
 ✅ Docker compose for local development
 ✅ Python pipeline (consumer → transformer → writer)

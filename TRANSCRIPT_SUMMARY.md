@@ -36,7 +36,6 @@
 - 86% code coverage (target: 85%)
 
 ## Key Decisions
-
 1. **Real Clickhouse Client:** Lazy loading in writer to avoid hard dependency
 2. **Skip Integration Tests in CI/CD:** Require live services (docker-compose only)
 3. **Prometheus Metrics:** Built-in, no external dependencies for basic monitoring
@@ -44,7 +43,6 @@
 5. **Terraform Modules:** Reusable, environment-parameterized (dev/prod)
 
 ## Technical Highlights
-
 - **Compliance-First:** FCA/SOX-ready audit hashing from Day 1
 - **Observable:** Prometheus metrics at every pipeline stage
 - **Resilient:** Retry logic, graceful error handling, connection pooling
@@ -52,7 +50,6 @@
 - **Production-Ready Code:** Follows best practices (mypy strict, black formatted)
 
 ## Week 4 Plan
-
 - [ ] AWS/GCP deployment
 - [ ] Alerting integration (PagerDuty/Slack)
 - [ ] Load testing (1M+ txn/day)
@@ -61,7 +58,6 @@
 - [ ] Production runbook
 
 ## How to Use This Repository
-
 1. **Portfolio Pitch:** "I built a production-grade fintech data pipeline in 2 weeks"
 2. **Technical Interview:** Walk through architecture, compliance model, metrics design
 3. **Code Review:** Demonstrate testing discipline, type safety, infrastructure as code

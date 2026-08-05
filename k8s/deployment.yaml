@@ -1,0 +1,62 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: settlement-pipeline
+  namespace: fintech
+spec:
+  replicas: 3
+  selector:
+    matchlabels:
+      app: settlement-pipeline
+  template:
+    metadata:
+      labels:
+        app: settlement-pipeline
+    spec:
+      containers:
+      - name: app
+        image: fintech-data-platform:v1.0
+        ports:
+        - containerPort: 8000
+          name: metrics
+        env:
+        - name: KAFKA_BOOTSTRAP_SERVERS
+          value: "kafka-broker-1:9092,kafka-broker-2:9092,kafka-broker-3:9092"
+        - name: CLICKHOUSE_HOST
+          value: "clickhouse-primary"
+        - name: CLICKHOUSE_PORT
+          value: "9000"
+        livenessProbe:
+          httpGet:
+            path: /metrics
+            port: 8000
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /metrics
+            port: 8000
+          initialDelaySeconds: 10
+          periodSeconds: 5
+        resources:
+          requests:
+            memory: "512Mi"
+            cpu: "500m"
+          limits:
+            memory: "1Gi"
+            cpu: "1000m"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: settlement-pipeline
+  namespace: fintech
+spec:
+  selector:
+    app: settlement-pipeline
+  ports:
+  - port: 8000
+    targetPort: 8000
+    name: metrics
+  type: ClusterIP
+ 
