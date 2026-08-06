@@ -24,7 +24,7 @@ def start_metrics_server(port: int = 8000) -> None:
 
         app = FastAPI()
 
-        @app.get("/metrics")  # type: ignore[misc]
+        @app.get("/metrics")
         def metrics() -> Response:
             """Prometheus metrics endpoint."""
             return Response(metrics_handler(), media_type="text/plain")
