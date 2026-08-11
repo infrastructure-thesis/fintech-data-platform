@@ -38,3 +38,42 @@ variable "ecs_task_count" {
   description = "Number of ECS tasks"
   default     = 3
 }
+
+variable "ecr_repository_url" {
+  type        = string
+  description = "ECR repository URL"
+}
+
+variable "image_tag" {
+  type        = string
+  description = "Docker image tag"
+  default     = "latest"
+}
+
+variable "kafka_bootstrap_servers" {
+  type        = string
+  description = "Kafka bootstrap servers"
+}
+
+variable "clickhouse_host" {
+  type        = string
+  description = "Clickhouse host"
+}
+
+variable "ecs_desired_count" {
+  type        = number
+  description = "Desired number of ECS tasks"
+  default     = 3
+}
+
+variable "ecs_min_capacity" {
+  type        = number
+  description = "Minimum ECS task count for auto-scaling"
+  default     = 2
+}
+
+variable "ecs_max_capacity" {
+  type        = number
+  description = "Maximum ECS task count for auto-scaling"
+  default     = 10
+}
