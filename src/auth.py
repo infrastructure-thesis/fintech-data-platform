@@ -14,8 +14,7 @@ logger = get_logger(__name__)
 # Configuration
 # In src/auth.py (line ~10)
 SECRET_KEY = (
-    "your-secret-key-from-secrets-manager-"
-    "minimum-32-bytes-required-for-sha256"
+    "your-secret-key-from-secrets-manager-" "minimum-32-bytes-required-for-sha256"
 )
 ALGORITHM = "HS256"
 TOKEN_EXPIRY_MINUTES = 60
