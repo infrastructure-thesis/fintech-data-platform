@@ -99,7 +99,7 @@ async def login(credentials: LoginRequest) -> LoginResponse:
 
     return LoginResponse(
         access_token=token,
-        token_type="bearer",
+        token_type="bearer",  # nosec B106 - OAuth2 standard, not password
         expires_in=3600,
     )
 

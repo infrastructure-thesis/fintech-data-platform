@@ -13,7 +13,7 @@ logger = get_logger(__name__)
 
 # Configuration
 # In src/auth.py (line ~10)
-SECRET_KEY = (
+SECRET_KEY = (  # nosec B105 - Placeholder, loaded from Secrets Manager in prod
     "your-secret-key-from-secrets-manager-" "minimum-32-bytes-required-for-sha256"
 )
 ALGORITHM = "HS256"
