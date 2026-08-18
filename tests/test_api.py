@@ -303,4 +303,3 @@ def test_process_admin_missing_admin_scope(client, valid_token):
 
     assert response.status_code == 403
     assert "Missing required scope: admin" in response.json()["detail"]
-    
