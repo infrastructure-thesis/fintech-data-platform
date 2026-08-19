@@ -23,7 +23,7 @@ class RedisCache:
         port: int = REDIS_PORT,
         db: int = REDIS_DB,
     ) -> None:
-        self.client: redis.Redis[str] = redis.Redis(
+        self.client = redis.Redis(  # type: ignore[var-annotated]
             host=host,
             port=port,
             db=db,
@@ -35,10 +35,10 @@ class RedisCache:
     def get(self, key: str) -> Optional[Any]:
         """Get value from cache."""
         try:
-            value = self.client.get(key)
+            value = self.client.get(key)  # type: ignore[union-attr]
             if value:
                 logger.debug("cache_hit", key=key)
-                return json.loads(value)
+                return json.loads(value)  # type: ignore[arg-type]
             logger.debug("cache_miss", key=key)
             return None
         except Exception as e:
@@ -78,11 +78,17 @@ class RedisCache:
     def get_stats(self) -> dict[str, Any]:
         """Get cache statistics."""
         try:
-            info = self.client.info()
+            info = self.client.info()  # type: ignore[union-attr]
             return {
-                "used_memory": (info.get("used_memory_human")),
-                "connected_clients": (info.get("connected_clients")),
-                "total_commands": (info.get("total_commands_processed")),
+                "used_memory": (
+                    info.get("used_memory_human")  # type: ignore[union-attr]
+                ),
+                "connected_clients": (
+                    info.get("connected_clients")  # type: ignore[union-attr]
+                ),
+                "total_commands": (
+                    info.get("total_commands_processed")  # type: ignore[union-attr]
+                ),
                 "keyspace": self.client.dbsize(),
             }
         except Exception as e:
