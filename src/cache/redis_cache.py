@@ -80,15 +80,9 @@ class RedisCache:
         try:
             info = self.client.info()
             return {
-                "used_memory": (
-                    info.get("used_memory_human")
-                ),
-                "connected_clients": (
-                    info.get("connected_clients")
-                ),
-                "total_commands": (
-                    info.get("total_commands_processed")
-                ),
+                "used_memory": (info.get("used_memory_human")),
+                "connected_clients": (info.get("connected_clients")),
+                "total_commands": (info.get("total_commands_processed")),
                 "keyspace": self.client.dbsize(),
             }
         except Exception as e:
@@ -109,10 +103,7 @@ def cache_result(
         @wraps(func)
         def wrapper(*args: Any, **kwargs: Any) -> Any:
             # Generate cache key from function name and arguments
-            cache_key = (
-                f"{func.__module__}:{func.__name__}:"
-                f"{args}:{kwargs}"
-            )
+            cache_key = f"{func.__module__}:{func.__name__}:" f"{args}:{kwargs}"
 
             # Try to get from cache
             cached_value = cache.get(cache_key)
