@@ -23,7 +23,7 @@ class RedisCache:
         port: int = REDIS_PORT,
         db: int = REDIS_DB,
     ) -> None:
-        self.client = redis.Redis(
+        self.client: redis.Redis[str] = redis.Redis(
             host=host,
             port=port,
             db=db,
