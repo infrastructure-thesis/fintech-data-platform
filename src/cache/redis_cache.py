@@ -23,7 +23,7 @@ class RedisCache:
         port: int = REDIS_PORT,
         db: int = REDIS_DB,
     ) -> None:
-        self.client = redis.Redis(  # type: ignore[var-annotated]
+        self.client = redis.Redis(
             host=host,
             port=port,
             db=db,
@@ -35,10 +35,10 @@ class RedisCache:
     def get(self, key: str) -> Optional[Any]:
         """Get value from cache."""
         try:
-            value = self.client.get(key)  # type: ignore[union-attr]
+            value = self.client.get(key)
             if value:
                 logger.debug("cache_hit", key=key)
-                return json.loads(value)  # type: ignore[arg-type]
+                return json.loads(value)
             logger.debug("cache_miss", key=key)
             return None
         except Exception as e:
@@ -78,16 +78,16 @@ class RedisCache:
     def get_stats(self) -> dict[str, Any]:
         """Get cache statistics."""
         try:
-            info = self.client.info()  # type: ignore[union-attr]
+            info = self.client.info()
             return {
                 "used_memory": (
-                    info.get("used_memory_human")  # type: ignore[union-attr]
+                    info.get("used_memory_human")
                 ),
                 "connected_clients": (
-                    info.get("connected_clients")  # type: ignore[union-attr]
+                    info.get("connected_clients")
                 ),
                 "total_commands": (
-                    info.get("total_commands_processed")  # type: ignore[union-attr]
+                    info.get("total_commands_processed")
                 ),
                 "keyspace": self.client.dbsize(),
             }
@@ -109,7 +109,10 @@ def cache_result(
         @wraps(func)
         def wrapper(*args: Any, **kwargs: Any) -> Any:
             # Generate cache key from function name and arguments
-            cache_key = f"{func.__module__}:{func.__name__}:" f"{args}:{kwargs}"
+            cache_key = (
+                f"{func.__module__}:{func.__name__}:"
+                f"{args}:{kwargs}"
+            )
 
             # Try to get from cache
             cached_value = cache.get(cache_key)
