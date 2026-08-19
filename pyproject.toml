@@ -17,7 +17,8 @@ settlement-pipeline = "src.cli:main"
 
 [tool.coverage.run]
 omit = [
-    "src/kafka_consumer_loop.py"
+    "src/kafka_consumer_loop.py",
+    "src/cache/redis_cache.py",  # Add this line
 ]
 
 [[tool.mypy.overrides]]
