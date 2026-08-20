@@ -10,7 +10,7 @@ variable "environment" {
   default     = "dev"
 
   validation {
-    condition     = can(regex("^(dev|staging|prod)$", var.enviroment))
+    condition     = can(regex("^(dev|staging|prod)$", var.environment))
     error_message = "Environment must be dev, staging, or prod."
   }
 }
@@ -76,4 +76,20 @@ variable "ecs_max_capacity" {
   type        = number
   description = "Maximum ECS task count for auto-scaling"
   default     = 10
+}
+
+variable "alert_email" {
+  type        = string
+  description = "Email address for CloudWatch alerts"
+  default     = "ops@company.com"
+}
+
+variable "kafka" {
+  type = object({
+    bootstrap_servers = string
+  })
+  description = "Kafka configuration"
+  default = {
+    bootstrap_servers = "localhost:9092"
+  }
 }

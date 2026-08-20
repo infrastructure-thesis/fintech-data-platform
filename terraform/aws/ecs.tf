@@ -122,9 +122,9 @@ resource "aws_security_group" "ecs_tasks" {
   vpc_id      = aws_vpc.main.id
 
   ingress {
-    from_port   = 8000
-    to_port     = 8000
-    protocol    = "tcp"
+    from_port       = 8000
+    to_port         = 8000
+    protocol        = "tcp"
     security_groups = [aws_security_group.alb.id]
   }
 
@@ -187,9 +187,9 @@ resource "aws_ecs_task_definition" "main" {
       logConfiguration = {
         logDriver = "awslogs"
         options = {
-            "awslogs-group"         = aws_cloudwatch_log_group.ecs.name
-            "awslogs-region"        = var.aws_region
-            "awslogs-stream-prefix" = "ecs"
+          "awslogs-group"         = aws_cloudwatch_log_group.ecs.name
+          "awslogs-region"        = var.aws_region
+          "awslogs-stream-prefix" = "ecs"
         }
       }
 
@@ -262,11 +262,11 @@ resource "aws_appautoscaling_policy" "ecs_policy_cpu" {
 
 # Auto Scaling Policy (Memory)
 resource "aws_appautoscaling_policy" "ecs_policy_memory" {
-  name = "settlement-memory-autoscaling"
-  policy_type = "TargetTrackingScaling"
-  resource_id = aws_appautoscaling_target.ecs_target.resource_id
+  name               = "settlement-memory-autoscaling"
+  policy_type        = "TargetTrackingScaling"
+  resource_id        = aws_appautoscaling_target.ecs_target.resource_id
   scalable_dimension = aws_appautoscaling_target.ecs_target.scalable_dimension
-  service_namespace = aws_appautoscaling_target.ecs_target.service_namespace
+  service_namespace  = aws_appautoscaling_target.ecs_target.service_namespace
 
   target_tracking_scaling_policy_configuration {
     predefined_metric_specification {

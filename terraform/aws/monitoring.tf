@@ -10,7 +10,7 @@ resource "aws_cloudwatch_dashboard" "main" {
         properties = {
           metrics = [
             ["AWS/ECS", "CPUUtilization", "ServiceName", "settlement-service", "ClusterName", "settlement-ecs-cluster"],
-            [".", "MemoryUtilization", ".", ".", ".", ".",],
+            [".", "MemoryUtilization", ".", ".", ".", ".", ],
             ["AWS/ApplicationELB", "TargetResponseTime", "LoadBalancer", "app/settlement-alb/*"],
             [".", "RequestCount", ".", "."]
           ]
@@ -146,7 +146,7 @@ resource "aws_cloudwatch_metric_alarm" "alb_unhealthy_targets" {
   alarm_actions       = [aws_sns_topic.settlement_alerts.arn]
 
   dimensions = {
-    TargetGroup = "targetgroup/settlement-tg/*"
+    TargetGroup  = "targetgroup/settlement-tg/*"
     LoadBalancer = "app/settlement-alb/*"
   }
 
@@ -164,7 +164,7 @@ resource "aws_cloudwatch_metric_alarm" "alb_response_time" {
   namespace           = "AWS/ApplicationELB"
   period              = 300
   statistic           = "Average"
-  threshold           = 0.5  # 500ms
+  threshold           = 0.5 # 500ms
   alarm_description   = "Alert when response time exceeds 500ms"
   alarm_actions       = [aws_sns_topic.settlement_alerts.arn]
 
