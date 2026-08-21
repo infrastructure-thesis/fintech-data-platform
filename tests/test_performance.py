@@ -8,14 +8,14 @@ import pytest
 from src.cache.redis_cache import RedisCache, cache_result
 
 
-def pytest_runtest_setup(item):
-    """Skip all performance tests if Redis unavailable."""
-    if "test_performance" in str(item.fspath):
-        try:
-            cache = RedisCache(host="localhost", port=6379, db=0)
-            cache.client.ping()
-        except Exception:
-            pytest.skip("Redis not available", allow_module_level=True)
+def is_redis_available() -> bool:
+    """Check if Redis is available."""
+    try:
+        cache = RedisCache(host="localhost", port=6379, db=0)
+        cache.client.ping()
+        return True
+    except Exception:
+        return False
 
 
 @pytest.fixture
@@ -27,15 +27,7 @@ def redis_cache() -> Generator[RedisCache, None, None]:
     cache_inst.flush()
 
 
-@pytest.fixture(autouse=True)
-def flush_cache() -> Generator[None, None, None]:
-    """Auto-flush cache before each test."""
-    cache = RedisCache(host="localhost", port=6379, db=0)
-    cache.flush()
-    yield
-    cache.flush()
-
-
+@pytest.mark.skipif(not is_redis_available(), reason="Redis not available")
 def test_cache_set_get_performance(redis_cache: RedisCache) -> None:
     """Test cache set/get performance."""
     test_data = {
@@ -55,6 +47,7 @@ def test_cache_set_get_performance(redis_cache: RedisCache) -> None:
     assert get_time < 0.05
 
 
+@pytest.mark.skipif(not is_redis_available(), reason="Redis not available")
 def test_cache_decorator_caching() -> None:
     """Test cache decorator effectiveness."""
     call_count = 0
@@ -73,6 +66,7 @@ def test_cache_decorator_caching() -> None:
     assert result1 == result2
 
 
+@pytest.mark.skipif(not is_redis_available(), reason="Redis not available")
 def test_cache_miss_performance(redis_cache: RedisCache) -> None:
     """Test cache miss doesn't block execution."""
     redis_cache.delete("nonexistent_key")
@@ -85,6 +79,7 @@ def test_cache_miss_performance(redis_cache: RedisCache) -> None:
     assert elapsed < 0.01
 
 
+@pytest.mark.skipif(not is_redis_available(), reason="Redis not available")
 def test_cache_ttl_expiry(redis_cache: RedisCache) -> None:
     """Test cache TTL functionality."""
     redis_cache.set("expiry_test", {"data": "value"}, ttl=1)
@@ -95,6 +90,7 @@ def test_cache_ttl_expiry(redis_cache: RedisCache) -> None:
     assert redis_cache.get("expiry_test") is None
 
 
+@pytest.mark.skipif(not is_redis_available(), reason="Redis not available")
 def test_cache_stats(redis_cache: RedisCache) -> None:
     """Test cache statistics retrieval."""
     redis_cache.set("stat_test", {"data": "value"}, ttl=60)
@@ -106,6 +102,7 @@ def test_cache_stats(redis_cache: RedisCache) -> None:
     assert stats["keyspace"] >= 1
 
 
+@pytest.mark.skipif(not is_redis_available(), reason="Redis not available")
 def test_concurrent_cache_access(redis_cache: RedisCache) -> None:
     """Test concurrent cache access."""
 
