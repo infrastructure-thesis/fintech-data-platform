@@ -1,6 +1,4 @@
 """Webhook event system tests."""
-from datetime import datetime, timezone
-
 import pytest
 
 from src.webhooks.events import (

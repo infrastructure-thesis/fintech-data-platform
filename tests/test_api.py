@@ -226,13 +226,24 @@ def test_process_error_handling(
 
 
 def test_metrics_endpoint(client: TestClient) -> None:
-    """Test metrics endpoint (no auth required)."""
-    response = client.get("/metrics")
+    """Test metrics endpoint (API key auth required)."""
+    response = client.get(
+        "/metrics",
+        headers={"X-Api-Key": "test-key"}
+    )
 
     assert response.status_code == 200
-    assert b"# HELP" in response.content or len(response.content) > 0
+    assert "settlement_transactions_processed_total" in response.text or response.text == ""
 
 
+def test_metrics_endpoint_missing_key(client: TestClient) -> None:
+    """Test metrics endpoint without API key."""
+    response = client.get("/metrics")
+
+    assert response.status_code == 401
+    assert "API key required" in response.json()["detail"]
+     
+    
 def test_require_scope_decorator_missing_scope(client):
     """Test require_scope decorator rejects missing scope."""
     read_only_token = jwt_auth.create_token(

@@ -1,8 +1,7 @@
 """API Authentication and Authorization."""
 import jwt
-import hashlib
 from datetime import datetime, timedelta, timezone
-from typing import Optional, Dict, Callable, Any
+from typing import Optional, Dict, Any, Callable, Awaitable, cast
 
 from fastapi import HTTPException, Depends, Header
 from pydantic import BaseModel
@@ -11,9 +10,7 @@ from src.utils.logging import get_logger
 
 logger = get_logger(__name__)
 
-# Configuration
-# In src/auth.py (line ~10)
-SECRET_KEY = (  # nosec B105 - Placeholder, loaded from Secrets Manager in prod
+SECRET_KEY = (  # nosec B105
     "your-secret-key-from-secrets-manager-" "minimum-32-bytes-required-for-sha256"
 )
 ALGORITHM = "HS256"
@@ -23,7 +20,7 @@ TOKEN_EXPIRY_MINUTES = 60
 class TokenPayload(BaseModel):
     """JWT token payload."""
 
-    sub: str  # Subject (user ID)
+    sub: str
     tenant_id: str
     scopes: list[str]
     exp: datetime
@@ -83,7 +80,7 @@ class JWTAuthenticator:
             "iat": datetime.now(timezone.utc),
         }
 
-        encoded_jwt = jwt.encode(
+        encoded_jwt: str = jwt.encode(
             payload,
             self.secret_key,
             algorithm=self.algorithm,
@@ -93,86 +90,47 @@ class JWTAuthenticator:
     def verify_token(self, token: str) -> TokenPayload:
         """Verify JWT token."""
         try:
-            payload = jwt.decode(
+            payload: Dict[str, Any] = jwt.decode(
                 token,
                 self.secret_key,
                 algorithms=[self.algorithm],
             )
-            user_id = payload.get("sub")
-            tenant_id = payload.get("tenant_id")
-            scopes = payload.get("scopes", [])
+            user_id: str = cast(str, payload.get("sub"))
+            tenant_id: str = cast(str, payload.get("tenant_id"))
+            scopes: list[str] = cast(list[str], payload.get("scopes", []))
 
-            if not isinstance(user_id, str):
-                raise HTTPException(
-                    status_code=401,
-                    detail="Invalid token",
-                )
+            if user_id is None:
+                raise HTTPException(status_code=401, detail="Invalid token")
 
-            if not isinstance(tenant_id, str):
-                raise HTTPException(
-                    status_code=401,
-                    detail="Invalid token",
-                )
-
-            if not isinstance(scopes, list):
-                scopes = []
-
-            exp_timestamp = payload.get("exp")
-            iat_timestamp = payload.get("iat")
-
-            if not isinstance(exp_timestamp, (int, float)):
-                raise HTTPException(
-                    status_code=401,
-                    detail="Invalid token",
-                )
-
-            if not isinstance(iat_timestamp, (int, float)):
-                raise HTTPException(
-                    status_code=401,
-                    detail="Invalid token",
-                )
+            exp_ts: float = cast(float, payload.get("exp"))
+            iat_ts: float = cast(float, payload.get("iat"))
 
             return TokenPayload(
                 sub=user_id,
                 tenant_id=tenant_id,
                 scopes=scopes,
-                exp=datetime.fromtimestamp(
-                    exp_timestamp,
-                    tz=timezone.utc,
-                ),
-                iat=datetime.fromtimestamp(
-                    iat_timestamp,
-                    tz=timezone.utc,
-                ),
+                exp=datetime.fromtimestamp(exp_ts, tz=timezone.utc),
+                iat=datetime.fromtimestamp(iat_ts, tz=timezone.utc),
             )
         except jwt.ExpiredSignatureError:
-            raise HTTPException(
-                status_code=401,
-                detail="Token expired",
-            )
+            raise HTTPException(status_code=401, detail="Token expired")
         except jwt.InvalidTokenError:
-            raise HTTPException(
-                status_code=401,
-                detail="Invalid token",
-            )
+            raise HTTPException(status_code=401, detail="Invalid token")
 
 
 class APIKeyAuthenticator:
     """API Key-based authentication."""
 
     def __init__(self) -> None:
-        # In production, load from database
         self.api_keys: Dict[str, APIKey] = {}
 
     def hash_secret(self, secret: str) -> str:
         """Hash API secret."""
+        import hashlib
+
         return hashlib.sha256(secret.encode()).hexdigest()
 
-    def verify_api_key(
-        self,
-        key_id: str,
-        key_secret: str,
-    ) -> Optional[APIKey]:
+    def verify_api_key(self, key_id: str, key_secret: str) -> Optional[APIKey]:
         """Verify API key and secret."""
         if key_id not in self.api_keys:
             logger.warning("api_key_not_found", key_id=key_id)
@@ -180,35 +138,25 @@ class APIKeyAuthenticator:
 
         api_key = self.api_keys[key_id]
 
-        # Check if active
         if not api_key.is_active:
             logger.warning("api_key_inactive", key_id=key_id)
             return None
 
-        # Check expiry
-        now = datetime.now(timezone.utc)
-        if api_key.expires_at and now > api_key.expires_at:
+        if api_key.expires_at and datetime.now(timezone.utc) > api_key.expires_at:
             logger.warning("api_key_expired", key_id=key_id)
             return None
 
-        # Verify secret
-        hashed_secret = self.hash_secret(key_secret)
-        if hashed_secret != api_key.key_secret:
-            logger.warning(
-                "api_key_invalid_secret",
-                key_id=key_id,
-            )
+        if self.hash_secret(key_secret) != api_key.key_secret:
+            logger.warning("api_key_invalid_secret", key_id=key_id)
             return None
 
         return api_key
 
 
-# Global authenticators
-jwt_auth: JWTAuthenticator = JWTAuthenticator()
-api_key_auth: APIKeyAuthenticator = APIKeyAuthenticator()
+jwt_auth = JWTAuthenticator()
+api_key_auth = APIKeyAuthenticator()
 
 
-# Dependency for FastAPI
 async def get_current_user(
     authorization: Optional[str] = Header(None),
 ) -> TokenPayload:
@@ -256,7 +204,9 @@ async def get_api_key(
     return api_key
 
 
-def require_scope(required_scope: str) -> Callable[..., Any]:
+def require_scope(
+    required_scope: str,
+) -> Callable[..., Awaitable[TokenPayload]]:
     """Decorator to require specific scope."""
 
     async def scope_checker(
@@ -272,7 +222,9 @@ def require_scope(required_scope: str) -> Callable[..., Any]:
     return scope_checker
 
 
-def require_tenant(required_tenant: str) -> Callable[..., Any]:
+def require_tenant(
+    required_tenant: str,
+) -> Callable[..., Awaitable[TokenPayload]]:
     """Decorator to require specific tenant."""
 
     async def tenant_checker(

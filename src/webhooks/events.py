@@ -2,7 +2,7 @@
 import json
 import hmac
 import hashlib
-from typing import Any, Callable, Dict, List
+from typing import Any, Callable, Dict, List, Optional
 from datetime import datetime, timezone
 from enum import Enum
 
@@ -30,7 +30,7 @@ class WebhookEvent:
         event_type: EventType,
         tenant_id: str,
         data: Dict[str, Any],
-        timestamp: datetime = None,
+        timestamp: Optional[datetime] = None,
     ) -> None:
         self.event_type = event_type
         self.tenant_id = tenant_id
@@ -70,18 +70,21 @@ class WebhookRegistry:
     """Registry for webhook handlers."""
 
     def __init__(self) -> None:
-        self.handlers: Dict[EventType, List[Callable]] = {}
+        self.handlers: Dict[EventType, List[Callable[[WebhookEvent], None]]] = {}
 
     def register(
         self,
         event_type: EventType,
-        handler: Callable,
+        handler: Callable[[WebhookEvent], None],
     ) -> None:
         """Register a handler for an event type."""
         if event_type not in self.handlers:
             self.handlers[event_type] = []
         self.handlers[event_type].append(handler)
-        logger.info("webhook_handler_registered", event_type=event_type.value)
+        logger.info(
+            "webhook_handler_registered",
+            event_type=event_type.value,
+        )
 
     async def emit(self, event: WebhookEvent) -> None:
         """Emit an event to all registered handlers."""
@@ -89,7 +92,7 @@ class WebhookRegistry:
 
         for handler in handlers:
             try:
-                await handler(event)
+                handler(event)  # Remove await - handlers are sync
             except Exception as e:
                 logger.error(
                     "webhook_handler_error",

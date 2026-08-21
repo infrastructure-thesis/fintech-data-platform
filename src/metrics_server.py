@@ -19,15 +19,16 @@ def start_metrics_server(port: int = 8000) -> None:
     """Start HTTP server for metrics (requires FastAPI/Uvicorn)."""
     try:
         from fastapi import FastAPI
-        from fastapi.responses import Response
         import uvicorn
 
         app = FastAPI()
 
+        # At line 27, add type: ignore to the decorator
         @app.get("/metrics")
-        def metrics() -> Response:
+        def metrics() -> str:
             """Prometheus metrics endpoint."""
-            return Response(metrics_handler(), media_type="text/plain")
+            metrics_bytes = get_metrics()
+            return metrics_bytes.decode("utf-8")
 
         logger.info(
             "metrics_server_started",
